@@ -1,0 +1,14 @@
+[project]
+name = "norway-api-emitter"
+version = "0.1.0"
+description = "Stream BarentsWatch AIS updates and publish validated MessagePack messages to NATS"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "almanach",
+    "httpx>=0.28.1",
+    "nats-py>=2.12.0",
+]
+
+[tool.uv.sources]
+almanach = { git = "https://github.com/bateau-ais/almanach.git" }

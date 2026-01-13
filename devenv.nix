@@ -26,7 +26,7 @@
   # https://devenv.sh/tasks/
   tasks = {
     "norway-api-emitter:setup".exec = "uv sync";
-    "norway-api-emitter:run".exec = "uv run parser";
+    "norway-api-emitter:run".exec = "uv run main.py";
   };
 
   # https://devenv.sh/tests/

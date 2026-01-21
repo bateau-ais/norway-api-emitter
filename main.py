@@ -110,7 +110,6 @@ async def main(since_date = None):
                 await nc.flush()
                 logger.info("Starting streaming mode...")
 
-            """
             # Start streaming real-time data
             async with client.stream(
                 "GET", url, headers={"Authorization": f"Bearer {token}"}
@@ -124,7 +123,6 @@ async def main(since_date = None):
 
                     logger.info(f"Publishing '{msg.msg_uuid}'...")
                     await nc.publish(f"{nats_subject}.{msg.mmsi}", to_msgpack(msg))
-            """
     finally:
         flush_task.cancel()
         await nc.drain()

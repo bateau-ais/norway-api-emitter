@@ -56,7 +56,7 @@ async def fetch_and_publish_historical_data(
     nats_subject: str,
 ):
     """Fetch historical AIS data since the given date and publish to NATS."""
-    url = f"https://live.ais.barentswatch.no/live/v1/latest/combined?since={since_date}&modelType=Full&modelFormat=Json"
+    url: str = f"https://live.ais.barentswatch.no/live/v1/latest/combined?since={since_date}&modelType=Full&modelFormat=Json"
 
     logger.info(f"Fetching historical data since {since_date}...")
     try:
@@ -67,36 +67,30 @@ async def fetch_and_publish_historical_data(
         raw_data = json.loads(r.text)
         
         # Validate each message individually, skipping invalid ones
-        valid_messages = []
         for item in raw_data:
             try:
                 msg = ApiAisMessage.model_validate(item)
-                valid_messages.append(msg)
-            except ValidationError as e:
-                logger.warning(f"Skipping invalid AIS message: {e}")
+                logger.info(f"Publishing historical message '{msg.msg_uuid}'...")
+                await nc.publish(f"{nats_subject}.{msg.mmsi}", to_msgpack(msg))
+            except ValidationError as e:  # ignore invalid messages
                 continue
-
-        for msg in valid_messages:
-            logger.info(f"Publishing historical message '{msg.msg_uuid}'...")
-            await nc.publish(f"{nats_subject}.{msg.mmsi}", to_msgpack(msg))
-
         logger.info(f"Finished publishing historical data from {since_date}")
+
     except httpx.HTTPError as e:
         logger.error(f"Error fetching historical data: {e}")
         raise
 
 
 async def main(since_date = None):
-    token = os.environ.get("BARENTSWATCH_AIS_TOKEN")
+    token: str | None = os.environ.get("BARENTSWATCH_AIS_TOKEN")
     if not token:
         raise SystemExit("Missing env var BARENTSWATCH_AIS_TOKEN")
 
-    nats_url = os.environ.get("NATS_URL", "nats://127.0.0.1:4222")
-    nats_subject = os.environ.get("NATS_SUBJECT", "raw_ais")
-    flush_interval = float(os.environ.get("FLUSH_INTERVAL", "5.0"))
+    nats_url: str = os.environ.get("NATS_URL", "nats://127.0.0.1:4222")
+    nats_subject: str = os.environ.get("NATS_SUBJECT", "raw_ais")
+    flush_interval: float = float(os.environ.get("FLUSH_INTERVAL", "5.0"))
 
-    url = "https://live.ais.barentswatch.no/live/v1/combined?modelType=Full&modelFormat=Json"
-
+    url: str = "https://live.ais.barentswatch.no/live/v1/combined?modelType=Full&modelFormat=Json"
     nc = await nats.connect(servers=[nats_url])
     flush_task = asyncio.create_task(periodic_flush(nc, flush_interval))
 
@@ -121,7 +115,7 @@ async def main(since_date = None):
                     except ValidationError:
                         continue
 
-                    logger.info(f"Publishing '{msg.msg_uuid}'...")
+                    logger.info(f"Publishing live message '{msg.msg_uuid}'...")
                     await nc.publish(f"{nats_subject}.{msg.mmsi}", to_msgpack(msg))
     finally:
         flush_task.cancel()
@@ -142,7 +136,7 @@ if __name__ == "__main__":
         "--since",
         type=str,
         dest="since_date",
-        help="Fetch historical data since this date (format: YYYY-MM-DD)",
+        help="Fetch historical data since this date (format: YYYY-MM-DD). ",
     )
     args = parser.parse_args()
 

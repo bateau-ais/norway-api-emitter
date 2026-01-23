@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 type BatchAIS = list[ApiAisMessage]
 
 RENAMES = {
+    "msgtime": "msg_time",
     "latitude": "lat",
     "longitude": "lon",
     "speedOverGround": "speed",

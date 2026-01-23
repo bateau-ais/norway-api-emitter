@@ -5,7 +5,7 @@ requires-python = ">=3.14"
 [[package]]
 name = "almanach"
 version = "0.0.0"
-source = { git = "https://github.com/bateau-ais/almanach.git#f49828c5f26f100d24b19faa98e3541a22706f8c" }
+source = { git = "https://github.com/bateau-ais/almanach.git#431a98ec37adeeabf25376484d2faccd6d97ba9a" }
 dependencies = [
     { name = "msgpack" },
     { name = "nats-py" },
@@ -128,6 +128,7 @@ dependencies = [
     { name = "almanach" },
     { name = "httpx" },
     { name = "nats-py" },
+    { name = "pydantic" },
 ]
 
 [package.metadata]
@@ -135,6 +136,7 @@ requires-dist = [
     { name = "almanach", git = "https://github.com/bateau-ais/almanach.git" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "nats-py", specifier = ">=2.12.0" },
+    { name = "pydantic", specifier = ">=2.12.5" },
 ]
 
 [[package]]
